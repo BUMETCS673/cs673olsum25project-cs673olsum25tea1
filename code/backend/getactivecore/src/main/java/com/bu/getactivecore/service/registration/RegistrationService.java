@@ -6,8 +6,8 @@ import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.api.EmailApi;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
 import com.bu.getactivecore.service.registration.api.RegistrationApi;
-import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
-import com.bu.getactivecore.service.registration.entity.RegistrationConfirmationDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationStatus;
@@ -113,7 +113,7 @@ public class RegistrationService implements RegistrationApi {
 
     @Override
     @Transactional
-    public RegistrationConfirmationDto confirmRegistration(ConfirmRegistrationRequestDto verificationDto) {
+    public ConfirmationResponseDto confirmRegistration(ConfirmationRequestDto verificationDto) {
         String username = validateConfirmationToken(verificationDto);
         synchronized (VERIFICATION_LOCK) {
             Users user = m_userRepo.findByUsername(username).orElseThrow(() -> {
@@ -140,7 +140,7 @@ public class RegistrationService implements RegistrationApi {
                 }
             }
         }
-        return RegistrationConfirmationDto.builder()
+        return ConfirmationResponseDto.builder()
                 .status(RegistrationStatus.SUCCESS)
                 .build();
     }
@@ -152,7 +152,7 @@ public class RegistrationService implements RegistrationApi {
      * @return the username extracted from the token.
      * @throws ApiException if the token is invalid or expired.
      */
-    private String validateConfirmationToken(ConfirmRegistrationRequestDto confirmRegistrationDto) {
+    private String validateConfirmationToken(ConfirmationRequestDto confirmRegistrationDto) {
         String username;
         try {
             m_jwtApi.validateToken(confirmRegistrationDto.getToken());

@@ -3,7 +3,7 @@ package com.bu.getactivecore.service.users;
 import com.bu.getactivecore.config.JavaGmailMailConfig;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.EmailVerificationService;
-import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.bu.getactivecore.shared.ErrorCode;
@@ -195,7 +195,7 @@ class UserLoginTest {
                 .at("/data/token")
                 .asText();
 
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(registrationToken);
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto(registrationToken);
         confirmRegistration(mockMvc, confirmReq);
 
         sendPost(mockMvc, LOGIN, new LoginRequestDto(username, password))

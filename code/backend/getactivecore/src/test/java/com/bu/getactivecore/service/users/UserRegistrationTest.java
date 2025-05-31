@@ -6,7 +6,7 @@ import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.EmailVerificationService;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
-import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.shared.ErrorCode;
 import org.junit.jupiter.api.AfterEach;
@@ -319,7 +319,7 @@ class UserRegistrationTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("");
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto("");
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
@@ -338,7 +338,7 @@ class UserRegistrationTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("invalid.token");
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto("invalid.token");
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
@@ -358,7 +358,7 @@ class UserRegistrationTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
         String token = jwtApi.generateToken("not_test_user");
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto(token);
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
@@ -383,7 +383,7 @@ class UserRegistrationTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
         String token = jwtApi.generateToken("test");
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto(token);
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
@@ -407,7 +407,7 @@ class UserRegistrationTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
         String token = jwtApi.generateToken("test", TokenClaimType.REGISTRATION_CONFIRMATION);
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto(token);
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
@@ -433,7 +433,7 @@ class UserRegistrationTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
         String token = jwtApi.generateToken(username, TokenClaimType.REGISTRATION_CONFIRMATION);
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto(token);
         confirmRegistration(mockMvc, confirmReq)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
@@ -468,7 +468,7 @@ class UserRegistrationTest {
         String username = "testuser";
         sendPost(mockMvc, REGISTER, new RegistrationRequestDto(email, username, VALID_PASSWORD)).andExpect(status().is2xxSuccessful());
 
-        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("invalid_token");
+        ConfirmationRequestDto confirmReq = new ConfirmationRequestDto("invalid_token");
         confirmRegistration(mockMvc, confirmReq)
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
