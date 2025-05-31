@@ -14,9 +14,9 @@ public class EmailTemplates {
             """
                     Welcome to GetActive! 🎉
                     
-                    Thanks for registering with us. To complete your registration, please confirm your email address by clicking the below link:
+                    Thanks for registering with us. To complete your registration, please enter the following verification token in the app:
                     
-                    Verify your email: %s
+                    Your verification token: %s
                     
                     This step ensures we’ve got the right email and lets you fully access your GetActive account.
                     

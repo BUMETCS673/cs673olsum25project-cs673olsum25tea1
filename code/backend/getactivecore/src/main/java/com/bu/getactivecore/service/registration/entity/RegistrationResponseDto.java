@@ -7,7 +7,9 @@ import lombok.Data;
 @Data
 public class RegistrationResponseDto {
 
-    RegistrationStatus status;
-
+    /**
+     * Confirmation token for informational purposes.
+     */
+    private String token;
 
 }

@@ -1,4 +1,4 @@
-package com.bu.getactivecore.service.users.validation;
+package com.bu.getactivecore.service.registration.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

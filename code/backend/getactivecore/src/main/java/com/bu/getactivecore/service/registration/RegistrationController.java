@@ -2,6 +2,7 @@ package com.bu.getactivecore.service.registration;
 
 import com.bu.getactivecore.service.registration.api.RegistrationApi;
 import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.RegistrationConfirmationDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
 import com.bu.getactivecore.shared.exception.ApiException;
@@ -38,7 +39,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/register/confirm", consumes = "application/json")
-    public RegistrationResponseDto verifyRegistration(@Valid @RequestBody ConfirmRegistrationRequestDto requestDto) throws ApiException {
+    public RegistrationConfirmationDto verifyRegistration(@Valid @RequestBody ConfirmRegistrationRequestDto requestDto) throws ApiException {
         log.debug("Got request at /register/confirm");
         return m_registrationApi.confirmRegistration(requestDto);
     }

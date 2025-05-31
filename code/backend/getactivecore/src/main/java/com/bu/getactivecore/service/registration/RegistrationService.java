@@ -7,6 +7,7 @@ import com.bu.getactivecore.service.email.api.EmailApi;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
 import com.bu.getactivecore.service.registration.api.RegistrationApi;
 import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.RegistrationConfirmationDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationStatus;
@@ -102,17 +103,17 @@ public class RegistrationService implements RegistrationApi {
         Users user = UserDto.from(email, username, encodedPassword);
         m_userRepo.save(user);
 
-        // TODO: implement the registration url logic
-        m_emailApi.sendVerificationEmail(email, "test_registration_url");
+        String registrationToken = m_jwtApi.generateToken(username, TokenClaimType.REGISTRATION_CONFIRMATION);
+        m_emailApi.sendVerificationEmail(email, registrationToken);
         return RegistrationResponseDto.builder()
-                .status(RegistrationStatus.SUCCESS)
+                .token(registrationToken)
                 .build();
     }
 
 
     @Override
     @Transactional
-    public RegistrationResponseDto confirmRegistration(ConfirmRegistrationRequestDto verificationDto) {
+    public RegistrationConfirmationDto confirmRegistration(ConfirmRegistrationRequestDto verificationDto) {
         String username = validateConfirmationToken(verificationDto);
         synchronized (VERIFICATION_LOCK) {
             Users user = m_userRepo.findByUsername(username).orElseThrow(() -> {
@@ -139,7 +140,7 @@ public class RegistrationService implements RegistrationApi {
                 }
             }
         }
-        return RegistrationResponseDto.builder()
+        return RegistrationConfirmationDto.builder()
                 .status(RegistrationStatus.SUCCESS)
                 .build();
     }

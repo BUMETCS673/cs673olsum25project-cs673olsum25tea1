@@ -39,8 +39,8 @@ public class EmailVerificationService implements EmailApi {
     }
 
     @Override
-    public void sendVerificationEmail(@NonNull String email, @NonNull String registrationUrl) throws ApiException {
-        String body = String.format(EmailTemplates.REGISTRATION_TEMPLATE, registrationUrl);
+    public void sendVerificationEmail(@NonNull String email, @NonNull String registrationToken) throws ApiException {
+        String body = String.format(EmailTemplates.REGISTRATION_TEMPLATE, registrationToken);
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom(m_serverEmail);
         msg.setTo(email);

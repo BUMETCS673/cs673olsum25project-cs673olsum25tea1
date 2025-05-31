@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.registration.entity;
 
-import com.bu.getactivecore.service.users.validation.ValidBuEmail;
+import com.bu.getactivecore.service.registration.validation.ValidBuEmail;
+import com.bu.getactivecore.service.registration.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
@@ -20,8 +21,6 @@ public class RegistrationRequestDto {
     @Size(max = 20, message = "Username can be most 20 characters")
     String username;
 
-    @NotBlank(message = "Password cannot be blank")
-    @Size(min = 2, message = "Password length must be at least 2 characters")
-    @Size(max = 32, message = "Password length can be most 32 characters")
+    @ValidPassword
     String password;
 }

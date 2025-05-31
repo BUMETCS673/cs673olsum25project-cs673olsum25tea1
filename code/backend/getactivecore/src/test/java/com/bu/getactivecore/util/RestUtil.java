@@ -1,5 +1,6 @@
 package com.bu.getactivecore.util;
 
+import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -125,7 +126,15 @@ public class RestUtil {
      */
     public static ResultActions registerAndLogin(MockMvc mockMvc, RegistrationRequestDto registerRequest) throws Exception {
         // Register the user first
-        register(mockMvc, registerRequest).andExpect(status().isOk());
+        MvcResult response = register(mockMvc, registerRequest).andExpect(status().isOk())
+                .andReturn();
+
+        // Confirm the registration
+        JsonNode jsonNode = objectMapper.readTree(response.getResponse().getContentAsString());
+        String confirmationToken = jsonNode.at("/data/token").asText();
+
+        confirmRegistration(mockMvc, new ConfirmRegistrationRequestDto(confirmationToken))
+                .andExpect(status().isOk());
 
         // Then log in with the registered user
         LoginRequestDto loginRequest = new LoginRequestDto(registerRequest.getUsername(), registerRequest.getPassword());

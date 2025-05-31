@@ -22,8 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
+import static com.bu.getactivecore.util.RestEndpoint.REGISTER;
 import static com.bu.getactivecore.util.RestUtil.confirmRegistration;
 import static com.bu.getactivecore.util.RestUtil.register;
+import static com.bu.getactivecore.util.RestUtil.sendPost;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,18 +35,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class UserRegistrationTest {
 
+    private static final String VALID_PASSWORD = "Test123.";
     @MockitoBean
     private EmailVerificationService emailVerificationService;
-
     @MockitoBean
     private JavaGmailMailConfig javaGmailMailConfig;
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private JwtApi jwtApi;
 
@@ -123,17 +122,8 @@ class UserRegistrationTest {
 
     @Test
     void given_empty_username_then_4xx_returned() throws Exception {
-        String invalidRequestJson = """
-                {
-                    "email": "123@bu.edu",
-                    "username": "",
-                    "password": "testpassword"
-                }
-                """;
-
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestJson))
+        RegistrationRequestDto req = new RegistrationRequestDto("123@bu.edu", "", VALID_PASSWORD);
+        register(mockMvc, req)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
@@ -145,17 +135,9 @@ class UserRegistrationTest {
 
     @Test
     void given_too_long_username_then_4xx_returned() throws Exception {
-        String invalidRequestJson = """
-                {
-                    "email": "123@bu.edu",
-                    "username": "this_is_really_really_long_username_that_exceeds_the_maximum_length",
-                    "password": "testpassword"
-                }
-                """;
-
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestJson))
+        RegistrationRequestDto req = new RegistrationRequestDto("123@bu.edu",
+                "this_is_really_really_long_username_that_exceeds_the_maximum_length", VALID_PASSWORD);
+        register(mockMvc, req)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
@@ -179,6 +161,31 @@ class UserRegistrationTest {
         mockMvc.perform(post("/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidRequestJson))
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.validationErrors").exists())
+                .andExpect(jsonPath("$.errors.validationErrors.username").doesNotExist())
+                .andExpect(jsonPath("$.errors.validationErrors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.validationErrors.password").exists());
+    }
+
+    @Test
+    void given_password_not_met_then_4xx_returned() throws Exception {
+        RegistrationRequestDto missingUpperCaseReq = new RegistrationRequestDto("123@bu.edu",
+                "123@bu.edu", "test123.");
+        register(mockMvc, missingUpperCaseReq)
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.validationErrors").exists())
+                .andExpect(jsonPath("$.errors.validationErrors.username").doesNotExist())
+                .andExpect(jsonPath("$.errors.validationErrors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.validationErrors.password").exists());
+
+        RegistrationRequestDto missingNumberCaseReq = new RegistrationRequestDto("123@bu.edu",
+                "123@bu.edu", "Testtest.");
+        register(mockMvc, missingNumberCaseReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
@@ -234,25 +241,15 @@ class UserRegistrationTest {
 
 
     @Test
-    void given_registered_user_and_same_credentials_used_for_registration_then_4xx_returned() throws Exception {
-        String validUserReq1 = """
-                {
-                    "email": "1234@bu.edu",
-                    "username": "test",
-                    "password": "test"
-                }
-                """;
+    void given_registration_attempted_with_same_credentials_then_4xx_returned() throws Exception {
 
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validUserReq1))
+        RegistrationRequestDto req = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
+        register(mockMvc, req)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validUserReq1))
+        register(mockMvc, req)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
@@ -261,32 +258,18 @@ class UserRegistrationTest {
     }
 
     @Test
-    void given_registered_user_and_same_email_used_for_registration_then_4xx_returned() throws Exception {
-        String validUserReq1 = """
-                {
-                    "email": "1234@bu.edu",
-                    "username": "test",
-                    "password": "test"
-                }
-                """;
-
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validUserReq1))
+    void given_registration_attempted_with_different_username_then_4xx_returned() throws Exception {
+        String email = "1234@bu.edu";
+        String username = "test";
+        String password = VALID_PASSWORD;
+        RegistrationRequestDto req = new RegistrationRequestDto(email, username, password);
+        register(mockMvc, req)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        String userReq2 = """
-                {
-                    "email": "1234@bu.edu",
-                    "username": "test2",
-                    "password": "test"
-                }
-                """;
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userReq2))
+        RegistrationRequestDto DiffUsernameReq = new RegistrationRequestDto(email, "test2", password);
+        register(mockMvc, DiffUsernameReq)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
@@ -298,8 +281,7 @@ class UserRegistrationTest {
     void verify_new_registered_user_is_assigned_UNVERIFIED_state() throws Exception {
         String username = "test";
         String email = "1234@bu.edu";
-        String password = "test";
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, password);
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -312,14 +294,14 @@ class UserRegistrationTest {
 
     @Test
     void given_registered_user_and_same_username_used_for_registration_then_4xx_returned() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        RegistrationRequestDto userReq2 = new RegistrationRequestDto("anothermail@bu.edu", "test", "test");
+        RegistrationRequestDto userReq2 = new RegistrationRequestDto("anothermail@bu.edu", "test", VALID_PASSWORD);
         register(mockMvc, userReq2)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
@@ -330,7 +312,7 @@ class UserRegistrationTest {
 
     @Test
     void given_empty_confirmation_token_then_4xx_returned() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -349,7 +331,7 @@ class UserRegistrationTest {
 
     @Test
     void given_invalid_confirmation_token_then_4xx_returned() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -368,7 +350,7 @@ class UserRegistrationTest {
 
     @Test
     void given_unknown_confirmation_user_token_then_4xx_returned() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -393,7 +375,7 @@ class UserRegistrationTest {
 
     @Test
     void given_non_confirmation_token_then_user_remains_UNVERIFIED() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -417,7 +399,7 @@ class UserRegistrationTest {
 
     @Test
     void given_confirmation_token_then_user_is_VERIFIED() throws Exception {
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -443,8 +425,7 @@ class UserRegistrationTest {
     void verify_register_confirmation_is_idempotent() throws Exception {
         String username = "test";
         String email = "1234@bu.edu";
-        String password = "test";
-        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, password);
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, VALID_PASSWORD);
 
         register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
@@ -478,5 +459,21 @@ class UserRegistrationTest {
         testUser = userRepository.findByUsername(username);
         Assertions.assertTrue(testUser.isPresent());
         Assertions.assertEquals(AccountState.VERIFIED.name(), testUser.get().getAccountState().name());
+    }
+
+
+    @Test
+    void given_invalid_confirmation_token_4xx_returned() throws Exception {
+        String email = "1234@bu.edu";
+        String username = "testuser";
+        sendPost(mockMvc, REGISTER, new RegistrationRequestDto(email, username, VALID_PASSWORD)).andExpect(status().is2xxSuccessful());
+
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("invalid_token");
+        confirmRegistration(mockMvc, confirmReq)
+                .andDo(print())
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.TOKEN_INVALID.getCode()));
     }
 }

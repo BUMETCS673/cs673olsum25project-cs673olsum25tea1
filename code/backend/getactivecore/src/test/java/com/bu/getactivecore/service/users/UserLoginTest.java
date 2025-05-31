@@ -3,12 +3,12 @@ package com.bu.getactivecore.service.users;
 import com.bu.getactivecore.config.JavaGmailMailConfig;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.EmailVerificationService;
+import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.bu.getactivecore.shared.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,8 +25,10 @@ import static com.bu.getactivecore.shared.ErrorCode.DATA_STRUCTURE_INVALID;
 import static com.bu.getactivecore.shared.ErrorCode.UNSUPPORTED_OPERATION;
 import static com.bu.getactivecore.util.RestEndpoint.LOGIN;
 import static com.bu.getactivecore.util.RestEndpoint.REGISTER;
+import static com.bu.getactivecore.util.RestUtil.confirmRegistration;
 import static com.bu.getactivecore.util.RestUtil.getToken;
 import static com.bu.getactivecore.util.RestUtil.login;
+import static com.bu.getactivecore.util.RestUtil.register;
 import static com.bu.getactivecore.util.RestUtil.sendGet;
 import static com.bu.getactivecore.util.RestUtil.sendPost;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -38,6 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserLoginTest {
+
+    private static final String VALID_PASSWORD = "Test123.";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,7 +58,7 @@ class UserLoginTest {
     private UserRepository userRepository;
 
     @AfterEach
-    void setUp() {
+    void cleanup() {
         userRepository.deleteAll();
     }
 
@@ -115,17 +119,10 @@ class UserLoginTest {
 
     @Test
     void verify_login_is_not_idempotent() throws Exception {
+        RegistrationRequestDto registerReqDto = new RegistrationRequestDto("1234@bu.edu", "testuser", VALID_PASSWORD);
 
-        RegistrationRequestDto registerReqDto = new RegistrationRequestDto("1234@bu.edu", "testuser", "testpassword");
         String token = getToken(mockMvc, registerReqDto);
         assertNotNull(token, "Token should not be null after registration and login");
-
-        // TODO use the actual verification JWT token
-        userRepository.findByEmailOrUserName(registerReqDto.getEmail(), registerReqDto.getUsername())
-                .ifPresent(user -> {
-                    user.setAccountState(com.bu.getactivecore.model.users.AccountState.VERIFIED);
-                    userRepository.save(user);
-                });
 
         // Artificial delay is needed to ensure the 'issued at' timestamp in the JWT is different since that field is in seconds
         CountDownLatch latch = new CountDownLatch(1);
@@ -150,7 +147,7 @@ class UserLoginTest {
     void given_registered_user_and_wrong_username_used_then_4xxx_returned() throws Exception {
         String email = "1234@bu.edu";
         String username = "testuser";
-        String password = "testpassword";
+        String password = VALID_PASSWORD;
 
         RegistrationRequestDto registerReqData = new RegistrationRequestDto(email, username, password);
         sendPost(mockMvc, REGISTER, registerReqData).andExpect(status().is2xxSuccessful());
@@ -163,20 +160,19 @@ class UserLoginTest {
     void given_registered_user_and_wrong_password_used_then_4xxx_returned() throws Exception {
         String email = "1234@bu.edu";
         String username = "testuser";
-        String password = "testpassword";
 
-        RegistrationRequestDto registerReqData = new RegistrationRequestDto(email, username, password);
+        RegistrationRequestDto registerReqData = new RegistrationRequestDto(email, username, VALID_PASSWORD);
         sendPost(mockMvc, REGISTER, registerReqData).andExpect(status().is2xxSuccessful());
 
-        sendPost(mockMvc, LOGIN, new LoginRequestDto(username, "this_password_does_not_match")).andExpect(status().is4xxClientError());
+        sendPost(mockMvc, LOGIN, new LoginRequestDto(username, "this_password_does_not_match"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    @Disabled("Disabled until the url for verification is set up")
     void given_unverified_registered_user_and_login_is_attempted_then_403_returned() throws Exception {
         String email = "1234@bu.edu";
         String username = "testuser";
-        String password = "testpassword";
+        String password = VALID_PASSWORD;
         sendPost(mockMvc, REGISTER, new RegistrationRequestDto(email, username, password)).andExpect(status().is2xxSuccessful());
 
         sendPost(mockMvc, LOGIN, new LoginRequestDto(username, password))
@@ -188,18 +184,19 @@ class UserLoginTest {
     }
 
     @Test
-    void given_verified_registered_user_and_login_is_attempted_then_token_and_2xxx_returned() throws Exception {
+    void verify_user_can_register_and_confirm_and_login() throws Exception {
         String email = "1234@bu.edu";
         String username = "testuser";
-        String password = "testpassword";
-        sendPost(mockMvc, REGISTER, new RegistrationRequestDto(email, username, password)).andExpect(status().is2xxSuccessful());
+        String password = VALID_PASSWORD;
+        RegistrationRequestDto req = new RegistrationRequestDto(email, username, password);
+        MvcResult response = register(mockMvc, req).andExpect(status().is2xxSuccessful())
+                .andReturn();
+        String registrationToken = objectMapper.readTree(response.getResponse().getContentAsString())
+                .at("/data/token")
+                .asText();
 
-        // TODO use the actual verification JWT token
-        userRepository.findByEmailOrUserName(email, username)
-                .ifPresent(user -> {
-                    user.setAccountState(com.bu.getactivecore.model.users.AccountState.VERIFIED);
-                    userRepository.save(user);
-                });
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(registrationToken);
+        confirmRegistration(mockMvc, confirmReq);
 
         sendPost(mockMvc, LOGIN, new LoginRequestDto(username, password))
                 .andExpect(status().is2xxSuccessful())

@@ -33,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ActivityTest {
 
+    private static final String VALID_PASSWORD = "Test123.";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @MockitoBean
@@ -71,7 +73,7 @@ class ActivityTest {
         when(accountChecker.assertVerified(any(Authentication.class))).thenReturn(true);
 
         // Register & login user1 to get its token
-        RegistrationRequestDto requestDto = new RegistrationRequestDto("user1@bu.edu", "user1", "testpassword");
+        RegistrationRequestDto requestDto = new RegistrationRequestDto("user1@bu.edu", "user1", VALID_PASSWORD);
         String u1token = getToken(mockMvc, requestDto);
 
         // Then create an activity using user1

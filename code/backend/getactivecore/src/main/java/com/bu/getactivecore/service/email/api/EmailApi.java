@@ -8,9 +8,9 @@ public interface EmailApi {
     /**
      * Sends a verification email to the user.
      *
-     * @param email           The email address of the user.
-     * @param registrationUrl The URL for the user to verify their email.
+     * @param email             The email address of the user.
+     * @param registrationToken The registration token to include in the email.
      */
-    void sendVerificationEmail(@NonNull String email, @NonNull String registrationUrl) throws ApiException;
+    void sendVerificationEmail(@NonNull String email, @NonNull String registrationToken) throws ApiException;
 
 }

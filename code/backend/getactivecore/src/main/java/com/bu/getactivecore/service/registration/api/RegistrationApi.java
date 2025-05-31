@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.registration.api;
 
 import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.RegistrationConfirmationDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
 import com.bu.getactivecore.shared.exception.ApiException;
@@ -26,5 +27,5 @@ public interface RegistrationApi {
      * @param verificationDto details for verifying the registration.
      * @return {@link RegistrationResponseDto} indicating the result of the verification registration.
      */
-    RegistrationResponseDto confirmRegistration(@Valid ConfirmRegistrationRequestDto verificationDto);
+    RegistrationConfirmationDto confirmRegistration(@Valid ConfirmRegistrationRequestDto verificationDto);
 }

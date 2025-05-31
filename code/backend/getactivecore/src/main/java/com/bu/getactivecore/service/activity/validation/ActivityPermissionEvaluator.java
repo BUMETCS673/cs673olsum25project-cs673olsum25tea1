@@ -1,4 +1,4 @@
-package com.bu.getactivecore.service.activity;
+package com.bu.getactivecore.service.activity.validation;
 
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.users.UserPrincipal;
