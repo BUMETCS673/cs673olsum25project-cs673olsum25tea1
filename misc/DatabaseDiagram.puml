@@ -1,0 +1,66 @@
+@startuml
+package model {
+
+    class User {
+        +id: UUID <<PK>>
+        +email: VARCHAR
+        +password: VARCHAR
+        +username: VARCHAR
+    }
+
+    enum TokenRequestReason {
+        REGISTRATION
+        PASSWORD_RESET
+    }
+
+    enum ParticipantRole {
+        ADMIN
+        GUEST
+    }
+
+    'Composite key class for Participant'
+    class ParticipantId {
+        +userId: UUID <<PK,FK>>
+        +activityId: UUID <<PK,FK>>
+    }
+
+    class Participant {
+        +userId: UUID <<FK>>
+        +activityId: UUID <<FK>>
+        +role: ParticipantRole
+    }
+
+    class Activity {
+        +id: UUID <<PK>>
+        +name: VARCHAR
+        +description: TEXT
+        +location: VARCHAR
+    }
+
+    'Composite key class for Token'
+    class TokenId {
+        +userId: UUID <<PK,FK>>
+        +reason: TokenRequestReason <<PK>>
+    }
+
+    class Token {
+        +userId: UUID <<FK>>
+        +reason: TokenRequestReason
+        +token: VARCHAR
+        +counter: INT
+        +createdDate: BIGINT
+        +expiryDate: BIGINT
+    }
+
+    'Relationships'
+    User "1" o-- "0..*" Participant : participates in
+    Activity "1" o-- "0..*" Participant : includes
+    Participant *-- ParticipantId : composite key
+    Participant --> ParticipantRole : has role
+
+    User "1" o-- "0..*" Token : issues
+    Token *-- TokenId : composite key
+    Token --> TokenRequestReason : for purpose
+
+}
+@enduml

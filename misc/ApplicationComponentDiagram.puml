@@ -1,0 +1,29 @@
+@startuml
+rectangle "GetActive Component Diagram" {
+    rectangle "GetActive Application" as APPLICATION {
+        node "Backend Docker Container" {
+            [REST API Controllers] as BACKEND_API
+            [Service Layer\nContains Core Business Logic] as BACKEND_SERVICE
+            [Spring JPA Repository Layer] as BACKEND_DATA
+        }
+        [BACKEND_API] -r-> [BACKEND_SERVICE] : uses
+        [BACKEND_SERVICE] <-r-> [BACKEND_DATA]
+
+        node "MySQL Docker Container" {
+            database "MySQL Database" {
+            }
+        }
+        [BACKEND_DATA] <-d-> [MySQL Database]
+
+        node "Frontend Docker Container" {
+           [React App]
+        }
+
+        [React App] -d-> [BACKEND_API]: HTTP Request\nGET\nPUT\nPOST\nDELETE
+        [React App] <-d- [BACKEND_API]: HTTP Response
+    }
+    cloud "AWS/Heroku/Etc" as CLOUD {
+    }
+}
+[APPLICATION] -u-> [CLOUD]: Deploys to Cloud Service
+@enduml

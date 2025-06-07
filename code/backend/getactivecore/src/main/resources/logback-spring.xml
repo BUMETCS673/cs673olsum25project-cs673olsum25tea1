@@ -1,0 +1,10 @@
+<configuration>
+    <!-- Import environment-specific configuration -->
+    <springProfile name="dev">
+        <include resource="logback-dev.xml"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <include resource="logback-prod.xml"/>
+    </springProfile>
+</configuration>
