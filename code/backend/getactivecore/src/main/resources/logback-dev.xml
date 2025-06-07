@@ -5,27 +5,27 @@
         </encoder>
     </appender>
 
-    <!--    <logger name="org.apache.catalina.core" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="org.springframework" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="_org.springframework" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="org.hibernate" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="com.zaxxer" level="DEBUG" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="org.jboss" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
-    <!--    <logger name="org.apache" level="OFF" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
+    <logger name="org.apache.catalina.core" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="org.springframework" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="_org.springframework" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="org.hibernate" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="com.zaxxer" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="org.jboss" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="org.apache" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
 
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
