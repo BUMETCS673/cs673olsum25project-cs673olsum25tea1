@@ -10,8 +10,8 @@ import lombok.Data;
 @Data
 public class ConfirmationResponseDto {
 
-    /**
-     * The status of the registration confirmation.
-     */
-    private RegistrationStatus status;
+	/**
+	 * The status of the registration confirmation.
+	 */
+	private RegistrationStatus status;
 }

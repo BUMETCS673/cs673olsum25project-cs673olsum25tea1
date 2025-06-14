@@ -113,8 +113,7 @@ public class ActivityController {
 	public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int size,
-			@RequestParam(defaultValue = "id") String sortBy,
-			@RequestParam(defaultValue = "true") boolean ascending) {
+			@RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "true") boolean ascending) {
 		Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 		Pageable pageable = PageRequest.of(page, size, sort);
 		return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));

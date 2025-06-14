@@ -6,6 +6,6 @@ import lombok.Value;
 @Value
 public class ActivityParticipantRequestDto {
 
-    @NotBlank(message = "Activity ID cannot be blank")
-    private String activityId;
+	@NotBlank(message = "Activity ID cannot be blank")
+	private String activityId;
 }

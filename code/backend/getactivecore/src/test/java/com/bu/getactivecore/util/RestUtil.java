@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
@@ -18,7 +19,6 @@ import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Utility class for performing REST API operations during tests.
@@ -95,7 +95,7 @@ public class RestUtil {
 	 */
 	public static ResultActions sendGet(MockMvc mockMvc, RestEndpoint endpoint, Map<String, String> pathParams,
 			String token) throws Exception {
-        return sendGet(mockMvc, endpoint, pathParams, token, null);
+		return sendGet(mockMvc, endpoint, pathParams, token, null);
 	}
 
 	public static ResultActions sendGet(MockMvc mockMvc, RestEndpoint endpoint, Map<String, String> pathParams,

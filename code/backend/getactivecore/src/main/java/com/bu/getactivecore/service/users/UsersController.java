@@ -21,20 +21,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value = "/v1")
 public class UsersController {
 
-    private final UserInfoApi m_userInfoApi;
+	private final UserInfoApi m_userInfoApi;
 
-    /**
-     * Constructs the UsersController.
-     *
-     * @param userInfoApi used to fetch and manage user information
-     */
-    public UsersController(UserInfoApi userInfoApi) {
-        m_userInfoApi = userInfoApi;
-    }
+	/**
+	 * Constructs the UsersController.
+	 *
+	 * @param userInfoApi used to fetch and manage user information
+	 */
+	public UsersController(UserInfoApi userInfoApi) {
+		m_userInfoApi = userInfoApi;
+	}
 
-    @PostMapping(path = "/login", consumes = "application/json")
-    public LoginResponseDto loginUser(@Valid @RequestBody LoginRequestDto loginUserDto) throws ApiException {
-        log.debug("Got request at /login");
-        return m_userInfoApi.loginUser(loginUserDto);
-    }
+	@PostMapping(path = "/login", consumes = "application/json")
+	public LoginResponseDto loginUser(@Valid @RequestBody LoginRequestDto loginUserDto) throws ApiException {
+		log.debug("Got request at /login");
+		return m_userInfoApi.loginUser(loginUserDto);
+	}
 }

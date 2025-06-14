@@ -9,9 +9,9 @@ import lombok.Value;
 @Value
 public class LoginRequestDto {
 
-    @NotBlank(message = "Username must not be blank")
-    String username;
+	@NotBlank(message = "Username must not be blank")
+	String username;
 
-    @NotBlank(message = "Password must not be blank")
-    String password;
+	@NotBlank(message = "Password must not be blank")
+	String password;
 }

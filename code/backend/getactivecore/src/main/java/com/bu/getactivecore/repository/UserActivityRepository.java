@@ -17,37 +17,37 @@ import com.bu.getactivecore.model.activity.UserActivity;
  */
 public interface UserActivityRepository extends JpaRepository<UserActivity, String> {
 
-    /**
-     * Finds the {@link UserActivity} based on given parameters.
-     *
-     * @param userId     The ID of the user to search its activity role.
-     * @param activityId The ID of the activity to search the given user's role in.
-     * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
-     */
+	/**
+	 * Finds the {@link UserActivity} based on given parameters.
+	 *
+	 * @param userId     The ID of the user to search its activity role.
+	 * @param activityId The ID of the activity to search the given user's role in.
+	 * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
+	 */
 	@Query("SELECT ua FROM UserActivity ua WHERE ua.user.userId = :userId AND ua.activity.id = :activityId")
-    Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
+	Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
 
-    /**
-     * Finds the {@link List of UserActivity} based on given parameters.
-     *
-     * @param activityId The ID of the user to search its activity role.
-     * @param role       The user's role in an activity.
-     * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
-     */
-    List<UserActivity> findByActivityIdAndRole(String activityId, RoleType role);
+	/**
+	 * Finds the {@link List of UserActivity} based on given parameters.
+	 *
+	 * @param activityId The ID of the user to search its activity role.
+	 * @param role       The user's role in an activity.
+	 * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
+	 */
+	List<UserActivity> findByActivityIdAndRole(String activityId, RoleType role);
 
-    /**
-     * Delete an activity based on given parameters.
-     *
-     * @param activityId The ID of the user to search its activity role.
-     */
-    void deleteByActivityId(String activityId);
+	/**
+	 * Delete an activity based on given parameters.
+	 *
+	 * @param activityId The ID of the user to search its activity role.
+	 */
+	void deleteByActivityId(String activityId);
 
 //    @Query("SELECT ua FROM UserActivity ua JOIN FETCH ua.activity WHERE ua.userId = :userId")
 //    List<UserActivity> findJoinedActivitiesByUserId(String userId);
 
 	@Query("SELECT ua FROM UserActivity ua JOIN ua.activity JOIN ua.user WHERE ua.user.userId = :userId")
-    List<UserActivity> findJoinedActivitiesByUserId(String userId);
+	List<UserActivity> findJoinedActivitiesByUserId(String userId);
 
 	// @Query(value="SELECT ua FROM user_activities ua JOIN FETCH ua.activity a JOIN
 	// users u ON ua.user.userId = u.userId " + "WHERE a.id = :activityId",

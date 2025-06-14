@@ -1,19 +1,22 @@
 package com.bu.getactivecore.shared;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Builder;
+import lombok.Data;
+
 /**
  * Represents a standardized error payload for API responses.
  * <p>
- * This class is used by {@link com.bu.getactivecore.service.security.GlobalExceptionHandler} to build
+ * This class is used by
+ * {@link com.bu.getactivecore.service.security.GlobalExceptionHandler} to build
  * consistent error responses sent back to API clients.
  */
 @Data
@@ -21,37 +24,35 @@ import java.util.Map;
 @Builder(toBuilder = true)
 public final class ApiErrorPayload {
 
+	/**
+	 * Timestamp when the error occurred, formatted as "dd-MM-yyyy hh:mm:ss".
+	 */
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	@Builder.Default
+	private final LocalDateTime timestamp = LocalDateTime.now();
 
-    /**
-     * Timestamp when the error occurred, formatted as "dd-MM-yyyy hh:mm:ss".
-     */
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    @Builder.Default
-    private final LocalDateTime timestamp = LocalDateTime.now();
+	/**
+	 * HTTP status code for the error response.
+	 */
+	private HttpStatus status;
 
-    /**
-     * HTTP status code for the error response.
-     */
-    private HttpStatus status;
+	/**
+	 * Application-specific error code enum.
+	 */
+	private ErrorCode errorCode;
 
-    /**
-     * Application-specific error code enum.
-     */
-    private ErrorCode errorCode;
+	/**
+	 * Detailed error message.
+	 */
+	private String message;
 
-    /**
-     * Detailed error message.
-     */
-    private String message;
+	/**
+	 * List of validation errors, if any.
+	 */
+	private Map<String, List<String>> validationErrors;
 
-    /**
-     * List of validation errors, if any.
-     */
-    private Map<String, List<String>> validationErrors;
-
-
-    /**
-     * Detailed debug message, typically exception details.
-     */
-    private String debugMessage;
+	/**
+	 * Detailed debug message, typically exception details.
+	 */
+	private String debugMessage;
 }

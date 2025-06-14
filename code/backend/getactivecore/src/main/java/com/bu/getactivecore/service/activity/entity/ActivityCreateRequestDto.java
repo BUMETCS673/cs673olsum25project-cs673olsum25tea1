@@ -21,35 +21,31 @@ import lombok.Value;
 @Builder
 public class ActivityCreateRequestDto {
 
-    @NotBlank(message = "Name cannot be blank")
+	@NotBlank(message = "Name cannot be blank")
 	@Size(max = 250, message = "The length of name must be less or equal to 250")
 	String name;
 
-    @NotBlank(message = "Description cannot be blank")
-    @Size(max = 250, message = "The length of description must be less or equal to 250")
+	@NotBlank(message = "Description cannot be blank")
+	@Size(max = 250, message = "The length of description must be less or equal to 250")
 	String description;
 
-    @NotBlank(message = "Location cannot be blank")
+	@NotBlank(message = "Location cannot be blank")
 	@Size(max = 250, message = "The length of location must be less or equal to 250")
 	String location;
 
-    @NotNull(message = "Start DateTime cannot be blank")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	@NotNull(message = "Start DateTime cannot be blank")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	LocalDateTime startDateTime;
 
-    @NotNull(message = "End DateTime cannot be blank")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	@NotNull(message = "End DateTime cannot be blank")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	LocalDateTime endDateTime;
 
-    public static Activity from(ActivityCreateRequestDto request) {
-        return Activity.builder()
-                .location(request.getLocation())
-                .name(request.getName())
-                .startDateTime(request.getStartDateTime())
-                .endDateTime(request.getEndDateTime())
-                .description(request.getDescription())
-                .build();
-    }
+	public static Activity from(ActivityCreateRequestDto request) {
+		return Activity.builder().location(request.getLocation()).name(request.getName())
+				.startDateTime(request.getStartDateTime()).endDateTime(request.getEndDateTime())
+				.description(request.getDescription()).build();
+	}
 }

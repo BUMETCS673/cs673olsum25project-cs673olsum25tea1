@@ -33,7 +33,6 @@ import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
-import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.shared.exception.ApiException;
 
 @ExtendWith(MockitoExtension.class)

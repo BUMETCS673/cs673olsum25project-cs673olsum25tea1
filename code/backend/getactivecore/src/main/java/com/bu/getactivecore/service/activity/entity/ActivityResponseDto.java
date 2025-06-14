@@ -9,8 +9,8 @@ import lombok.Value;
  */
 @Value
 public class ActivityResponseDto {
-    /**
-     * The activity details.
-     */
-    ActivityDto activity;
+	/**
+	 * The activity details.
+	 */
+	ActivityDto activity;
 }

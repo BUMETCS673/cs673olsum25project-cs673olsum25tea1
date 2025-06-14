@@ -1,12 +1,11 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import lombok.Value;
-
 import java.util.List;
 
+import lombok.Value;
 
 @Value
 public class ActivityParticipantResponseDto {
 
-    List<UserActivityDto> activities;
+	List<UserActivityDto> activities;
 }

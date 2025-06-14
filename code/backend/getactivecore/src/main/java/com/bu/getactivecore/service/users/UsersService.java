@@ -27,42 +27,42 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UsersService implements UserInfoApi {
 
-    private final AuthenticationManager m_authManager;
+	private final AuthenticationManager m_authManager;
 
-    private final JwtApi m_jwtApi;
+	private final JwtApi m_jwtApi;
 
-    private final AccountStateChecker m_accountStateChecker;
+	private final AccountStateChecker m_accountStateChecker;
 
-    /**
-     * Constructor for UsersService.
-     *
-     * @param authManager used for login operations
-     */
-    public UsersService(AuthenticationManager authManager, JwtApi jwtApi, AccountStateChecker accountStateChecker) {
-        m_authManager = authManager;
-        m_jwtApi = jwtApi;
-        m_accountStateChecker = accountStateChecker;
-    }
+	/**
+	 * Constructor for UsersService.
+	 *
+	 * @param authManager used for login operations
+	 */
+	public UsersService(AuthenticationManager authManager, JwtApi jwtApi, AccountStateChecker accountStateChecker) {
+		m_authManager = authManager;
+		m_jwtApi = jwtApi;
+		m_accountStateChecker = accountStateChecker;
+	}
 
-    @Override
-    public LoginResponseDto loginUser(LoginRequestDto requestDto) {
-        // Given unauthenticated credentials, use the authentication manager to authenticate the user
-        Authentication authentication = m_authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
+	@Override
+	public LoginResponseDto loginUser(LoginRequestDto requestDto) {
+		// Given unauthenticated credentials, use the authentication manager to
+		// authenticate the user
+		Authentication authentication = m_authManager.authenticate(
+				new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
 
-        // If authentication is successful, the user is logged in
-        if (!authentication.isAuthenticated()) {
-            ApiErrorPayload error = ApiErrorPayload.builder().status(UNAUTHORIZED).errorCode(WRONG_CREDENTIALS)
-                    .message("Invalid credentials provided")
-                    .build();
-            throw new ApiException(error);
-        }
+		// If authentication is successful, the user is logged in
+		if (!authentication.isAuthenticated()) {
+			ApiErrorPayload error = ApiErrorPayload.builder().status(UNAUTHORIZED).errorCode(WRONG_CREDENTIALS)
+					.message("Invalid credentials provided").build();
+			throw new ApiException(error);
+		}
 
-        // Only verified users can access resources
-        m_accountStateChecker.assertVerified(authentication);
+		// Only verified users can access resources
+		m_accountStateChecker.assertVerified(authentication);
 
-        String token = m_jwtApi.generateToken(requestDto.getUsername());
-        UserDto userDto = ((UserPrincipal) authentication.getPrincipal()).getUserDto();
-        return new LoginResponseDto(token, userDto.getUsername(), userDto.getEmail());
-    }
+		String token = m_jwtApi.generateToken(requestDto.getUsername());
+		UserDto userDto = ((UserPrincipal) authentication.getPrincipal()).getUserDto();
+		return new LoginResponseDto(token, userDto.getUsername(), userDto.getEmail());
+	}
 }

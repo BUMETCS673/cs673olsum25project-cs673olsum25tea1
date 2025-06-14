@@ -19,70 +19,71 @@ import jakarta.validation.Valid;
  */
 public interface ActivityApi {
 
-    /**
-     * Retrieves all activities.
-     *
-     * @return List of all activities
-     */
-    Page<ActivityDto> getAllActivities(Pageable page);
+	/**
+	 * Retrieves all activities.
+	 *
+	 * @return List of all activities
+	 */
+	Page<ActivityDto> getAllActivities(Pageable page);
 
-    /**
-     * Retrieves activities by their name.
-     *
-     * @param activityName Name of the activity to search for
-     * @return List of activities matching the given name
-     */
-    Page<ActivityDto> getActivityByName(String activityName, Pageable page);
+	/**
+	 * Retrieves activities by their name.
+	 *
+	 * @param activityName Name of the activity to search for
+	 * @return List of activities matching the given name
+	 */
+	Page<ActivityDto> getActivityByName(String activityName, Pageable page);
 
-    /**
-     * Creates a new activity.
-     *
-     * @param userId     ID of the user creating the activity
-     * @param requestDto Details of the activity to be created
-     * @return Response containing details of the created activity
-     */
-    void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
+	/**
+	 * Creates a new activity.
+	 *
+	 * @param userId     ID of the user creating the activity
+	 * @param requestDto Details of the activity to be created
+	 * @return Response containing details of the created activity
+	 */
+	void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
-    /**
-     * Delete an activity.
-     *
-     * @param activityId ID of a to be deleted activity
-     * @param requestDto Details of the activity to be deleted
-     */
-    void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
+	/**
+	 * Delete an activity.
+	 *
+	 * @param activityId ID of a to be deleted activity
+	 * @param requestDto Details of the activity to be deleted
+	 */
+	void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
 
-    /**
-     * Update an activity.
-     *
-     * @param activityId ID of a to be deleted activity
-     * @param requestDto Details of the activity to be updated
-     * @return Response containing details of the updated activity
-     */
-    ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
+	/**
+	 * Update an activity.
+	 *
+	 * @param activityId ID of a to be deleted activity
+	 * @param requestDto Details of the activity to be updated
+	 * @return Response containing details of the updated activity
+	 */
+	ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 
-    /**
-     * Retrieves a list of joined activities for the requested user.
-     *
-     * @param userId ID of the user whose joined activities are to be fetched
-     * @return List of {@link UserActivityDto} representing the activities the user has joined
-     */
-    List<UserActivityDto> getJoinedActivities(String userId);
+	/**
+	 * Retrieves a list of joined activities for the requested user.
+	 *
+	 * @param userId ID of the user whose joined activities are to be fetched
+	 * @return List of {@link UserActivityDto} representing the activities the user
+	 *         has joined
+	 */
+	List<UserActivityDto> getJoinedActivities(String userId);
 
-    /**
-     * Joins an activity.
-     *
-     * @param userId     ID of the user joining the activity
-     * @param activityId ID of the activity to join
-     */
-    void joinActivity(String userId, String activityId);
+	/**
+	 * Joins an activity.
+	 *
+	 * @param userId     ID of the user joining the activity
+	 * @param activityId ID of the activity to join
+	 */
+	void joinActivity(String userId, String activityId);
 
-    /**
-     * Leaves an activity.
-     *
-     * @param userId     ID of the user leaving the activity
-     * @param activityId ID of the activity to leave
-     */
-    void leaveActivity(String userId, String activityId);
+	/**
+	 * Leaves an activity.
+	 *
+	 * @param userId     ID of the user leaving the activity
+	 * @param activityId ID of the activity to leave
+	 */
+	void leaveActivity(String userId, String activityId);
 
 	/**
 	 * Gets the roster of participants for a specific activity.
