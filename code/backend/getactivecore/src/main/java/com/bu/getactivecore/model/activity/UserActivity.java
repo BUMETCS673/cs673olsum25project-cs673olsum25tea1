@@ -1,9 +1,14 @@
 package com.bu.getactivecore.model.activity;
 
+import org.hibernate.annotations.UuidGenerator;
+
+import com.bu.getactivecore.model.users.Users;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -14,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UuidGenerator;
 
 /**
  * Purpose of this class is to provide a fast lookup of users and their activities.
@@ -34,8 +38,9 @@ public class UserActivity {
     @UuidGenerator
     private String id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id", referencedColumnName = "userId")
+	private Users user;
 
     @ManyToOne
     @JoinColumn(name = "activity_id", referencedColumnName = "id")

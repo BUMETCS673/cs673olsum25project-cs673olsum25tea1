@@ -2,6 +2,7 @@ package com.bu.getactivecore.service.users.entity;
 
 import com.bu.getactivecore.model.users.AccountState;
 import com.bu.getactivecore.model.users.Users;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -47,7 +48,13 @@ public class UserDto {
      * @return the UserDto
      */
     public static UserDto of(Users user) {
-        return new UserDto(user.getUserId(), user.getEmail(), user.getUsername(), user.getPassword(), user.getAccountState());
+		return UserDto.builder() //
+				.userId(user.getUserId()) //
+				.email(user.getEmail()) //
+				.username(user.getUsername()) //
+				.password(user.getPassword()) //
+				.accountState(user.getAccountState()) //
+				.build();
     }
 
     /**

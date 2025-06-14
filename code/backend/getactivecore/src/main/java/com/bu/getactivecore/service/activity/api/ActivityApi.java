@@ -1,15 +1,18 @@
 package com.bu.getactivecore.service.activity.api;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.bu.getactivecore.service.users.entity.ParticipantDto;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * Interface for managing activities.
@@ -80,4 +83,16 @@ public interface ActivityApi {
      * @param activityId ID of the activity to leave
      */
     void leaveActivity(String userId, String activityId);
+
+	/**
+	 * Gets the roster of participants for a specific activity.
+	 *
+	 * @param requestedUserId ID of the user requesting the participant list.
+	 * @param activityId      ID of the activity for which participants are to be
+	 *                        fetched.
+	 * @param pageable        Pagination information.
+	 * @return A paginated list of {@link ParticipantDto} objects.
+	 */
+	Page<ParticipantDto> getActivityRoster(String requestedUserId, String activityId, Pageable pageable);
+
 }

@@ -1,11 +1,12 @@
 package com.bu.getactivecore.service.activity.entity;
 
+import java.time.LocalDateTime;
+
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -31,7 +32,7 @@ public class UserActivityDto {
     public static UserActivityDto of(UserActivity userActivity) {
         return UserActivityDto.builder()
                 .id(userActivity.getId())
-                .userId(userActivity.getUserId())
+				.userId(userActivity.getUser().getUserId())
                 .name(userActivity.getActivity().getName())
                 .activityId(userActivity.getActivity().getId())
                 .description(userActivity.getActivity().getDescription())

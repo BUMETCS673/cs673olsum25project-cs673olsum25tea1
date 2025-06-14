@@ -8,6 +8,7 @@ public enum RestEndpoint {
     CONFIRM_REGISTRATION("/v1/register/confirmation"),
     LOGIN("/v1/login"),
     REGISTER("/v1/register"),
+	PARTICIPANTS("/v1/activities/{activityId}/participants"),
     RESEND_CONFIRMATION("/v1/register/confirmation/resend");
 
     private final String endpoint;

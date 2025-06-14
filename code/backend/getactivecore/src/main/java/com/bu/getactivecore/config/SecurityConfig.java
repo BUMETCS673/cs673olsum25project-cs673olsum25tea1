@@ -1,13 +1,16 @@
 package com.bu.getactivecore.config;
 
-import com.bu.getactivecore.service.security.CustomUserDetailsService;
+import static com.bu.getactivecore.shared.Constants.PASSWORD_ENCODER_STRENGTH;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,10 +25,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static com.bu.getactivecore.shared.Constants.PASSWORD_ENCODER_STRENGTH;
+import com.bu.getactivecore.service.security.CustomUserDetailsService;
 
 /**
  * This class configures the security settings for the application, including stateless session management,
@@ -81,7 +81,6 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
-                //.httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(m_jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

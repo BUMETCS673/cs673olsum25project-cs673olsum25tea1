@@ -33,6 +33,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // Test dependencies
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

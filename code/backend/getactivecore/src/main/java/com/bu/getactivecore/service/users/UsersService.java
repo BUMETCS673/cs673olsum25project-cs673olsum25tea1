@@ -1,5 +1,13 @@
 package com.bu.getactivecore.service.users;
 
+import static com.bu.getactivecore.shared.ErrorCode.WRONG_CREDENTIALS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
 import com.bu.getactivecore.service.users.api.UserInfoApi;
@@ -9,14 +17,8 @@ import com.bu.getactivecore.service.users.entity.UserDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import com.bu.getactivecore.shared.validation.AccountStateChecker;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
-import static com.bu.getactivecore.shared.ErrorCode.WRONG_CREDENTIALS;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Core logic for managing user related operations.
@@ -26,7 +28,9 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 public class UsersService implements UserInfoApi {
 
     private final AuthenticationManager m_authManager;
+
     private final JwtApi m_jwtApi;
+
     private final AccountStateChecker m_accountStateChecker;
 
     /**
