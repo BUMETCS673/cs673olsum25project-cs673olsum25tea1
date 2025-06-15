@@ -1,0 +1,43 @@
+@startuml
+title User Registration Verification
+actor User
+participant ":Registration Result Page" as Frontend
+participant ":Nginx" as Nginx
+participant ":Server" as Server
+database "Database" as DB
+
+== User clicks verification link from email ==
+User -> Frontend: Verification link clicked
+Frontend -> Nginx: HTTP POST /register/verify?token 
+Nginx -> Server: Forward request to /register/verify?token
+
+Server -> DB: getToken(token)
+alt Token not found
+    DB --> Server: Null
+    Nginx --> Frontend: 400 Bad Request (Invalid token)
+    Frontend -> User: Show "Invalid registration link" message
+else Token found
+    DB --> Server: Token
+    Server -> Server: verifyToken(token)
+    alt Token expired
+        Server --> Nginx: 400 Bad Request (Token expired)
+        Nginx --> Frontend: 400 Bad Request (Token expired)
+        Frontend -> User: Show "Registration link expired" message
+    end
+    Server -> DB: getUser(token.email)
+    alt User already exists
+        DB --> Server: User
+        Server --> Nginx: 400 Bad Request (User already exists)
+        Nginx --> Frontend: 400 Bad Request (User already exists)
+        Frontend -> User: Show "User already exists" message
+    end
+    DB ->> Server: Null
+    Server -> DB: deleteToken(token)
+    Server -> Server: createUser(token.email)
+    Server -> DB: insertUser(token.email)
+    Server -> Nginx: HTTP 200 OK (Token valid)
+    Nginx --> Frontend: 200 OK (Token valid)
+    Frontend -> User: Show "Email verified successfully" message
+end
+
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+package model {
+
+    class User {
+        +id: UUID <<PK>>
+        +email: VARCHAR
+        +password: VARCHAR
+        +username: VARCHAR
+    }
+
+    enum ParticipantRole {
+        ADMIN
+        PARTICIPANT
+    }
+
+    class Activity {
+        +id: UUID <<PK>>
+        +name: VARCHAR
+        +description: TEXT
+        +location: VARCHAR
+        +startTime: LocalDateTime
+        +endTime: LocalDateTime
+    }
+
+    class UserActivity {
+        +id: UUID <<PK>>
+        +userId: UUID <<FK>>
+        +activity: Activity
+        +role: RoleType <<Enum>>
+    }
+
+    class ActivityComment {
+        +id: UUID <<PK>>
+        +userId: UUID <<FK>>
+        +activityId: UUID <<FK>>
+        +comment: TEXT
+        +timestamp: LocalDateTime
+    }
+}
+
+    'Relationships'
+    User "1" o-- "0..*" UserActivity : participates in
+    Activity "1" o-- "0..*" UserActivity : includes
+    UserActivity --> ParticipantRole : is assigned a role
+    User "1" o-- "0..*" ActivityComment : participates in
+    Activity "1" o-- "0..*" ActivityComment : includes
+
+}
+@enduml

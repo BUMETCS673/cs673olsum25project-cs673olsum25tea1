@@ -1,0 +1,28 @@
+@startfiles
+/code/backend/getactivecore/src/main.java.com.bu.getactivecore/GetActiveApplication.java
+<note>
+"GetActiveApplication.java" is the main file for backend.
+</note>
+/code/backend/getactivecore/src/main.java.com.bu.getactivecore/config/
+/code/backend/getactivecore/src/main.java.com.bu.getactivecore/model/
+/code/backend/getactivecore/src/main.java.com.bu.getactivecore/repository/
+/code/backend/getactivecore/src/main.java.com.bu.getactivecore/service/
+/code/backend/getactivecore/src/test/
+
+/code/database/01-init.sql
+
+/code/frontend/App.jsx 
+<note>
+"App.jsx" is the main file for frontend.
+</note>
+/code/frontend/main.jsx
+/code/frontend/components/
+/code/frontend/contexts/
+/code/frontend/pages/
+/code/frontend/services/
+/code/frontend/utils/
+/code/frontend/tests/components/
+/code/frontend/tests/pages/
+/code/frontend/tests/utils/
+
+@endfiles

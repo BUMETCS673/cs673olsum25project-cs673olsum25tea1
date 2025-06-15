@@ -1,0 +1,168 @@
+@startuml
+package model {
+    class User {
+        -id: UUID
+        -email: String
+        -password: String
+        -username: String
+    }
+    enum TokenRequestReason {
+        REGISTRATION
+        PASSWORD_RESET
+    }
+    enum ParticipantRole {
+        ADMIN
+        PARTICIPANT
+    }
+    class UserActivity {
+        -userId: UUID
+        -user: User
+        -activity: Activity
+        -role: RoleType
+    }
+    class Activity {
+        -id: UUID
+        -name: String
+        -description: String
+        -location: String
+        -startTime: LocalDateTime
+        -endTime: LocalDateTime
+    }
+    class ActivityComment {
+        -id: UUID
+        -userId: UUID
+        -activityId: UUID
+        -comment: String
+        -timestamp: LocalDateTime
+    }
+
+    User "1" -l-> "0..*" UserActivity: Is a
+    Activity "1..*" -r-> "1.*" UserActivity : Has
+    UserActivity -d-> ParticipantRole: Is
+    Activity "1..*" -r-> "1.*" UserActivity : Has
+    User "1" -l-> "0..*" ActivityComment: Is a
+    Activity "1..*" -r-> "1.*" ActivityComment : Has
+}
+
+package repository {
+    interface UserRepository
+    interface ActivityRepository
+    interface TokenRepository
+    interface ParticipantRepository
+}
+
+package service {
+    class JwtService {
+        -tokenRepository: TokenRepository
+        +generateToken(userId: UUID, reason: TokenRequestReason): String
+        +getToken(tokenRequestDto: TokenRequestDto): String
+        +JwtService(jwtProperties: JwtProperties)
+        +generateToken(username: String, claimType:TokenClaimType): String
+        +getClaim(token: String, claimName: String): String
+        +getUsername(token: String): String
+        +isValid(token: String): boolean
+        +validateToken(token: String): boolean
+    }
+
+    enum TokenClaimType {
+        REGISTRATION_CONFIRMATION
+    }
+
+    class JwtProperties {
+        -secretKey: String
+        -expirationMs: long
+    }
+
+    interface JwtApi {
+        +generateToken(username: String, TokenClaimType claimType): String
+        +generateToken(username: String): String
+        +getUsername(token: String): String
+        +getClaim(token: String, claimName: String): String
+        +isValid(String token): boolean
+        +validateToken(String token): boolean
+        +validateToken(token: String, userDetails: UserDetails): boolean
+    }
+
+    class UserManagementService {
+        -JwtApi: JwtApi
+        -userRepository: UserRepository
+        -verificationServiceApi: VerificationServiceApi
+        +registerUser(registrationDto:RegistrationDto): void
+        +resetPassword(userId: UUID): boolean
+    }
+
+    interface UserManagementApi {
+        +registerUser(userDto): void
+        +resetPassword(userId): boolean
+    }
+
+    class ActivityService {
+        -activityRepository: ActivityRepository
+        -participantRepository: ParticipantRepository
+        +createActivity(createActivityDto: CreateActivityDto): ActivityDto
+        +updateActivity(updateActivityDto: UpdateActivityDto): ActivityDto
+        +deleteActivity(activityId: UUID): void
+        +getActivity(activityFilter: FilterActivityDto): List<ActivityDto>
+        +joinActivity(userId: UUID, activityId: UUID): void
+        +leaveActivity(userId: UUID, activityId: UUID): void
+        +getParticipantsOf(activityId: UUID): List<ParticipantDto>
+    }
+
+    interface ActivityServiceApi {
+        +createActivity(createActivityDto: CreateActivityDto): ActivityDto
+        +updateActivity(updateActivityDto: UpdateActivityDto): ActivityDto
+        +deleteActivity(activityId: UUID): void
+        +getActivity(activityFilter: FilterActivityDto): List<ActivityDto>
+        +joinActivity(userId: UUID, activityId: UUID): void
+        +leaveActivity(userId: UUID, activityId: UUID): void
+    }
+
+    class EmailVerificationService {
+        -userManagementApi: UserManagementApi
+        -emailVerificationRepository: VerificationRepository
+        -emailSpringServiceApi: emailSpringServiceApi
+        +sendVerificationEmail(user): void
+        +getVerification(email: String): EmailVerificationDto
+    }
+
+    interface VerificationServiceApi {
+        +sendVerification(userDto: UserDto): void
+        +isVerified(userDto: UserDto): boolean
+    }
+
+    JwtService .u.|> JwtApi: Implements
+    JwtService .u.> JwtProperties: Uses to configure JWT properties
+    UserManagementService .u.|> UserManagementApi: Implements
+    ActivityService .u.|> ActivityServiceApi: Implements
+    EmailVerificationService .u.|> VerificationServiceApi: Implements
+
+    UserManagementService -d-> repository.UserRepository: Uses to access user data
+    UserManagementService -u-> VerificationServiceApi: Uses to send verification email
+    UserManagementService -u-> JwtApi: Uses to generate token\nwhen user wants to register or reset password.
+    ActivityService -d-> repository.ActivityRepository: Uses to access activity data
+    ActivityService -d-> repository.ParticipantRepository: Uses to access UserActivity data
+}
+
+package controller {
+    class AuthController {
+        +register(): ResponseEntity
+        +login(): ResponseEntity
+    }
+
+    class ActivityController {
+        +createActivity(): ResponseEntity
+        +joinActivity(): ResponseEntity
+        +leaveActivity(): ResponseEntity
+    }
+
+    class UserController {
+        +registerUser(registrationDto:RegistrationDto): ResponseEntity
+        +resetPassword(userId: UUID): ResponseEntity
+    }
+
+    AuthController -d-> service.UserManagementApi: Uses
+    ActivityController -d-> service.ActivityServiceApi: Uses
+    UserController -d-> service.UserManagementApi: Uses
+}
+
+@enduml

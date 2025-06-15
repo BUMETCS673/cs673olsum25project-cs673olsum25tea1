@@ -1,0 +1,46 @@
+@startuml
+title User Registration Sequence Diagram
+actor User
+participant ":Registration Result Page" as Frontend
+participant ":Nginx" as Nginx
+participant ":Server" as Server
+database "Database" as DB
+
+User -> Frontend: 'Create' clicked with form\n(email, username, password)
+Frontend -> Nginx: POST /register (email, username, password)
+Nginx -> Server: Forward POST /register (email, username, password)
+Server -> Server: registerUser(registrationDto)
+Server -> Server: getRegisterTokenBy(email)
+
+Server -> DB: isCoolDownPeriodActive(token)
+alt If user in cool down period
+    DB -> Server: isCoolDownPeriodActive=true
+    Server -> Nginx: HTTP 429 code (Too many requests)
+    Nginx -> Frontend: HTTP 429 code (Too many requests)
+    Frontend -> User: Display "Please wait before trying again" message
+end
+DB -> Server: isCoolDownPeriodActive=false
+alt If registration token exists and registration attempt is greater than 3
+    Server -> DB: setInCoolDownPeriod(token)
+    Server -> Nginx: HTTP 429 code (Too many requests)
+    Nginx -> Frontend: HTTP 429 code (Too many requests)
+    Frontend -> User: Display "Please wait before trying again" message
+end
+
+Server -> DB: incrementAttemptBy(token)
+alt User exists
+    DB -> Server: User
+    Server -> Nginx: HTTP 400 code (User already exists)
+    Nginx -> Frontend: HTTP 400 code (User already exists)
+    Frontend -> User: Display "Email has been already registered, please log in" message
+else User does not exist
+    DB -> Server: null
+    Server -> DB: saveUser(email, username, password)
+    Server -> Server: generateRegisterToken(email)
+    Server -> DB: saveRegisterToken(email, token)
+    Server -> Server: sendRegisterEmail(email, token)
+    Server -> Nginx: HTTP 200 code (Registration successful)
+    Nginx -> Frontend: HTTP 200 code (Registration successful)
+    Frontend -> User: Display "Registration successful, please check your email for verification link" message
+end
+@enduml

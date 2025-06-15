@@ -1,0 +1,23 @@
+{
+  "name": "GetActive Frontend",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "files.eol": "\n"
+      },
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "github.copilot"]
+    }
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "npm install && npx cypress install",
+  "remoteUser": "root"
+
+  // Uncomment to run cypress tests in the devContainer. Also, update ".env.development" file
+  // ,"runArgs": ["--add-host=host.docker.internal:host-gateway"]
+}
